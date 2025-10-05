@@ -1,0 +1,515 @@
+<!-- index.html - Clean City, Green City (Run-ready) -->
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clean City, Green City — Persistent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { box-sizing: border-box; }
+    .gradient-bg { background: linear-gradient(135deg,#10b981 0%,#059669 100%); }
+    .scratch-card { background: linear-gradient(45deg,#ffd700,#ffed4e); position: relative; overflow: hidden; }
+    .scratch-overlay { background: #c0c0c0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+    .floating-animation { animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+    .pulse-green { animation: pulse-green 2s infinite; }
+    @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.7)}70%{box-shadow:0 0 0 10px rgba(16,185,129,0)} }
+    .slide-in { animation: slideIn 0.4s ease-out; }
+    @keyframes slideIn { from{transform:translateX(30px);opacity:0} to{transform:translateX(0);opacity:1} }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<nav class="gradient-bg text-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center"><div class="text-2xl font-bold">🌍 Clean City, Green City</div></div>
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-4">
+          <a href="#home" class="hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+          <a href="#report" class="hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium">Report Garbage</a>
+          <a href="#dashboard" class="hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+          <a href="#wards" class="hover:bg-green-700 px-3 py-2 rounded-md text-sm font-medium">Ward Info</a>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="bg-yellow-400 text-green-800 px-3 py-1 rounded-full text-sm font-bold">🪙 <span id="userCoins">0</span> Coins</div>
+        <button onclick="showLogin()" class="bg-white text-green-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100">Login</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="flex">
+  <!-- Main -->
+  <div class="flex-1 p-6">
+    <section id="home" class="gradient-bg rounded-xl p-8 mb-8 text-white">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 floating-animation">🌱 Make Your City Cleaner</h1>
+        <p class="text-xl mb-8">Report garbage, earn rewards, and help build a cleaner, greener city for everyone!</p>
+        <button onclick="showReportForm()" class="bg-white text-green-600 px-8 py-4 rounded-full text-lg font-bold hover:bg-gray-100 pulse-green">📸 Report Garbage Now</button>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg p-6 shadow-md text-center">
+        <div class="text-3xl font-bold text-green-600" id="totalReports">0</div>
+        <div class="text-gray-600">Reports Filed</div>
+      </div>
+      <div class="bg-white rounded-lg p-6 shadow-md text-center">
+        <div class="text-3xl font-bold text-blue-600" id="resolvedReports">0</div>
+        <div class="text-gray-600">Issues Resolved</div>
+      </div>
+      <div class="bg-white rounded-lg p-6 shadow-md text-center">
+        <div class="text-3xl font-bold text-yellow-600" id="totalCoins">0</div>
+        <div class="text-gray-600">Coins Earned</div>
+      </div>
+      <div class="bg-white rounded-lg p-6 shadow-md text-center">
+        <div class="text-3xl font-bold text-purple-600" id="activeUsers">0</div>
+        <div class="text-gray-600">Active Users</div>
+      </div>
+    </section>
+
+    <section id="reportSection" class="bg-white rounded-xl p-8 shadow-lg mb-8 hidden">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">📸 Report Garbage</h2>
+      <form id="reportForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+            <input type="text" id="reporterName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone/Email *</label>
+            <input type="text" id="reporterContact" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Area/Location *</label>
+          <input type="text" id="reportArea" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Enter your area or use GPS">
+          <button type="button" onclick="getLocation()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">📍 Use My Location</button>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Upload Photos (Max 5) *</label>
+          <input type="file" id="garbagePhotos" multiple accept="image/*" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          <div id="photoPreview" class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Additional Details</label>
+          <textarea id="reportDetails" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Describe the garbage situation..."></textarea>
+        </div>
+        <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-green-700 transition duration-200">🚀 Submit Report</button>
+      </form>
+    </section>
+
+    <section id="wardSection" class="bg-white rounded-xl p-8 shadow-lg mb-8">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">🏘️ Ward-wise Waste Collection</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="border border-gray-200 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-green-600 mb-3">Ward 1 - Central Area</h3>
+          <div class="space-y-2 text-sm">
+            <p><strong>Collector:</strong> Rajesh Kumar</p>
+            <p><strong>Phone:</strong> +91 98765-43210</p>
+            <p><strong>Vehicle:</strong> GJ-01-AB-1234</p>
+            <p><strong>Schedule:</strong> Mon, Wed, Fri - 7:00 AM</p>
+          </div>
+          <div class="mt-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Active</span></div>
+        </div>
+        <div class="border border-gray-200 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-green-600 mb-3">Ward 2 - North Zone</h3>
+          <div class="space-y-2 text-sm">
+            <p><strong>Collector:</strong> Priya Sharma</p>
+            <p><strong>Phone:</strong> +91 98765-43211</p>
+            <p><strong>Vehicle:</strong> GJ-01-AB-1235</p>
+            <p><strong>Schedule:</strong> Tue, Thu, Sat - 6:30 AM</p>
+          </div>
+          <div class="mt-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Active</span></div>
+        </div>
+        <div class="border border-gray-200 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-green-600 mb-3">Ward 3 - South Area</h3>
+          <div class="space-y-2 text-sm">
+            <p><strong>Collector:</strong> Amit Patel</p>
+            <p><strong>Phone:</strong> +91 98765-43212</p>
+            <p><strong>Vehicle:</strong> GJ-01-AB-1236</p>
+            <p><strong>Schedule:</strong> Daily - 8:00 AM</p>
+          </div>
+          <div class="mt-4"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">On Route</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboardSection" class="bg-white rounded-xl p-8 shadow-lg mb-8">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">📊 Your Dashboard</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-6 text-white">
+          <h3 class="text-lg font-semibold mb-2">Photos Submitted</h3>
+          <div class="text-3xl font-bold" id="userPhotos">0</div>
+        </div>
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg p-6 text-white">
+          <h3 class="text-lg font-semibold mb-2">Coins Earned</h3>
+          <div class="text-3xl font-bold" id="userCoinsDisplay">0</div>
+        </div>
+        <div class="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-6 text-white">
+          <h3 class="text-lg font-semibold mb-2">Awards Eligible</h3>
+          <div class="text-3xl font-bold" id="userAwards">0</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="w-80 bg-white shadow-lg p-6 h-screen overflow-y-auto">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">📢 Live Feedback</h3>
+    <div id="liveFeedback" class="space-y-4"></div>
+    <div class="mt-6">
+      <button id="exportDataBtn" class="w-full bg-blue-600 text-white py-2 rounded-md mb-2">⬇️ Export All Data (JSON)</button>
+      <button id="clearDataBtn" class="w-full bg-red-600 text-white py-2 rounded-md">🧹 Clear Local Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">🔐 Login to Clean City</h2>
+    <form id="loginForm">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+        <input type="tel" id="loginPhone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+      </div>
+      <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">Send OTP</button>
+    </form>
+    <button onclick="hideLogin()" class="mt-4 w-full text-gray-600 hover:text-gray-800">Cancel</button>
+  </div>
+</div>
+
+<!-- Scratch / Success Modals -->
+<div id="scratchModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">🎉 Congratulations!</h2>
+    <div class="scratch-card w-64 h-40 mx-auto rounded-lg relative mb-4">
+      <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-green-800">🪙 <span id="scratchCoins">0</span> Coins!</div>
+      <canvas id="scratchCanvas" class="scratch-overlay rounded-lg" width="256" height="160"></canvas>
+    </div>
+    <button id="collectScratchBtn" onclick="collectScratchReward()" class="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 disabled:opacity-60" disabled>Collect Reward</button>
+  </div>
+</div>
+
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
+    <div class="text-6xl mb-4">✅</div>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Report Submitted!</h2>
+    <p class="text-gray-600 mb-4">Your complaint ID: <strong id="complaintId">CC2024001</strong></p>
+    <p class="text-green-600 font-semibold mb-6">Wish you a great day! 🌟</p>
+    <button onclick="hideSuccessModal()" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">Close</button>
+  </div>
+</div>
+
+<script>
+/*
+  index.html JavaScript
+  - Persistence keys
+  - Reports stored with images as data URLs (note: for production use file uploads to server & store URLs)
+  - Scratch card logic: reveal >40% allows collect
+*/
+
+const STORAGE_REPORTS_KEY = 'cleanCityReports_v1';
+const STORAGE_USER_KEY = 'cleanCityUserData_v1';
+
+let reports = [];
+let userData = { photos:0, coins:0, awards:0, isLoggedIn:false };
+let currentScratch = { coins:0, scratchedPercent:0, enabled:false };
+
+// ---------- Helpers: Save / Load ----------
+function saveReportsToStorage(){ localStorage.setItem(STORAGE_REPORTS_KEY, JSON.stringify(reports)); }
+function loadReportsFromStorage(){ const raw = localStorage.getItem(STORAGE_REPORTS_KEY); return raw ? JSON.parse(raw) : []; }
+function saveUserData(){ localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(userData)); }
+function loadUserData(){ const raw = localStorage.getItem(STORAGE_USER_KEY); return raw ? JSON.parse(raw) : null; }
+
+function initializeApp(){
+  reports = loadReportsFromStorage();
+  const u = loadUserData(); if(u) userData = u;
+  updateUI();
+  setupEventListeners();
+  initializeScratchCanvas();
+  renderLiveFeedback();
+}
+
+// ---------- UI & Events ----------
+function setupEventListeners(){
+  document.getElementById('garbagePhotos').addEventListener('change', handlePhotoInput);
+  document.getElementById('reportForm').addEventListener('submit', onReportSubmit);
+  document.getElementById('loginForm').addEventListener('submit', onLoginSubmit);
+  document.getElementById('exportDataBtn').addEventListener('click', exportAllData);
+  document.getElementById('clearDataBtn').addEventListener('click', clearLocalData);
+}
+
+function showReportForm(){ document.getElementById('reportSection').classList.remove('hidden'); document.getElementById('reportSection').scrollIntoView({behavior:'smooth'}); }
+function showLogin(){ document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginModal').classList.add('flex'); }
+function hideLogin(){ document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginModal').classList.remove('flex'); }
+function showSuccessModal(){ document.getElementById('successModal').classList.remove('hidden'); document.getElementById('successModal').classList.add('flex'); }
+function hideSuccessModal(){ document.getElementById('successModal').classList.add('hidden'); document.getElementById('successModal').classList.remove('flex'); }
+function showScratchModal(){ document.getElementById('scratchModal').classList.remove('hidden'); document.getElementById('scratchModal').classList.add('flex'); }
+function hideScratchModal(){ document.getElementById('scratchModal').classList.add('hidden'); document.getElementById('scratchModal').classList.remove('flex'); }
+
+// ---------- Photo preview & conversion ----------
+function handlePhotoInput(e){
+  const files = Array.from(e.target.files).slice(0,5);
+  const preview = document.getElementById('photoPreview'); preview.innerHTML = '';
+  files.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const imgDiv = document.createElement('div'); imgDiv.className = 'relative';
+      imgDiv.innerHTML = `<img src="${ev.target.result}" class="w-full h-24 object-cover rounded-lg border-2 border-green-300"><div class="absolute top-1 right-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">${index+1}</div>`;
+      preview.appendChild(imgDiv);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function filesToDataURLs(files){
+  return Promise.all(files.map(file => new Promise(resolve=>{
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.readAsDataURL(file);
+  })));
+}
+
+// ---------- Report submission ----------
+async function onReportSubmit(evt){
+  evt.preventDefault();
+  const name = document.getElementById('reporterName').value.trim();
+  const contact = document.getElementById('reporterContact').value.trim();
+  const area = document.getElementById('reportArea').value.trim();
+  const details = document.getElementById('reportDetails').value.trim();
+  const files = Array.from(document.getElementById('garbagePhotos').files).slice(0,5);
+
+  if(!name || !contact || !area || files.length === 0){
+    alert('कृपया आवश्यक फ़ील्ड भरें और कम से कम एक फोटो अपलोड करें।');
+    return;
+  }
+
+  // convert files to data URLs (ok for demo/local)
+  const photosData = await filesToDataURLs(files);
+
+  const complaintId = `CC${new Date().getFullYear()}${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
+  const report = {
+    id: complaintId,
+    name, contact, area, details,
+    photos: photosData,
+    createdAt: new Date().toISOString(),
+    status: 'open'
+  };
+
+  reports.unshift(report);
+  saveReportsToStorage();
+
+  // update user data
+  userData.photos += photosData.length;
+  // coins: 1 coin per photo (adjustable)
+  userData.coins += photosData.length;
+  // recalc awards
+  userData.awards = calcAwards(userData.photos);
+  saveUserData();
+
+  // UI feedback
+  document.getElementById('complaintId').textContent = complaintId;
+  showSuccessModal();
+  updateUI();
+  renderLiveFeedback();
+
+  // reset form & preview
+  document.getElementById('reportForm').reset();
+  document.getElementById('photoPreview').innerHTML = '';
+
+  // prepare scratch card reward
+  currentScratch.coins = photosData.length;
+  currentScratch.scratchedPercent = 0;
+  currentScratch.enabled = true;
+  setTimeout(()=>{ hideSuccessModal(); showScratchModal(); resetScratchCanvas(); }, 900);
+}
+
+// ---------- Scratch card implementation ----------
+let scratchCanvas = null;
+let scratchCtx = null;
+let isScratching = false;
+
+function initializeScratchCanvas(){
+  scratchCanvas = document.getElementById('scratchCanvas');
+  if(!scratchCanvas) return;
+  scratchCtx = scratchCanvas.getContext('2d');
+  resetScratchCanvas();
+
+  // mouse events
+  scratchCanvas.addEventListener('mousedown', ()=> isScratching = true);
+  scratchCanvas.addEventListener('mouseup', ()=> isScratching = false);
+  scratchCanvas.addEventListener('mouseleave', ()=> isScratching = false);
+  scratchCanvas.addEventListener('mousemove', scratchMove);
+
+  // touch events
+  scratchCanvas.addEventListener('touchstart', (e) => { isScratching = true; scratchMove(e); });
+  scratchCanvas.addEventListener('touchend', ()=> isScratching = false);
+  scratchCanvas.addEventListener('touchmove', scratchMove);
+}
+
+function resetScratchCanvas(){
+  if(!scratchCtx) return;
+  scratchCtx.globalCompositeOperation = 'source-over';
+  scratchCtx.fillStyle = '#c0c0c0';
+  scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+  scratchCtx.fillStyle = '#666';
+  scratchCtx.font = '16px Arial';
+  scratchCtx.textAlign = 'center';
+  scratchCtx.fillText('Scratch here!', scratchCanvas.width/2, scratchCanvas.height/2);
+  document.getElementById('scratchCoins').textContent = currentScratch.coins || 0;
+  document.getElementById('collectScratchBtn').disabled = true;
+}
+
+function getCanvasPos(e){
+  const rect = scratchCanvas.getBoundingClientRect();
+  let clientX, clientY;
+  if(e.touches && e.touches[0]){ clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+  else { clientX = e.clientX; clientY = e.clientY; }
+  return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+function scratchMove(e){
+  if(!isScratching && !(e.type === 'touchstart' || e.type === 'touchmove')) return;
+  e.preventDefault();
+  const pos = getCanvasPos(e);
+  scratchCtx.globalCompositeOperation = 'destination-out';
+  scratchCtx.beginPath();
+  scratchCtx.arc(pos.x, pos.y, 18, 0, Math.PI * 2);
+  scratchCtx.fill();
+  // check scratched percentage occasionally
+  if(Math.random() < 0.06) checkScratchedPercent();
+}
+
+function checkScratchedPercent(){
+  if(!scratchCtx) return;
+  const imgData = scratchCtx.getImageData(0,0,scratchCanvas.width, scratchCanvas.height).data;
+  let total = imgData.length / 4;
+  let cleared = 0;
+  for(let i=3;i<imgData.length;i+=4){
+    if(imgData[i] === 0) cleared++;
+  }
+  const percent = Math.round((cleared / total) * 100);
+  currentScratch.scratchedPercent = percent;
+  // enable collect if >40%
+  if(percent > 40 && currentScratch.enabled){
+    document.getElementById('collectScratchBtn').disabled = false;
+  }
+}
+
+function collectScratchReward(){
+  if(!currentScratch.enabled) return;
+  // add coins to userData (already added at submission, but you might want to give extra on collect)
+  // We'll treat scratch as confirmation: give +bonus equal to coins (e.g., same number)
+  const bonus = currentScratch.coins;
+  userData.coins += bonus;
+  saveUserData();
+  updateUI();
+
+  // disable further collects for this reward
+  currentScratch.enabled = false;
+  document.getElementById('collectScratchBtn').disabled = true;
+  alert(`आपको ${bonus} अतिरिक्त coins मिले!`);
+  hideScratchModal();
+}
+
+// ---------- Login (demo) ----------
+function onLoginSubmit(e){
+  e.preventDefault();
+  const phone = document.getElementById('loginPhone').value;
+  if(phone && phone.length >= 4){
+    userData.isLoggedIn = true;
+    saveUserData();
+    hideLogin();
+    updateUI();
+    alert('OTP भेजा गया (डेमो) — आप लॉग इन हो गए हैं।');
+  } else {
+    alert('कृपया वैध फोन नंबर दर्ज करें।');
+  }
+}
+
+// ---------- UI updates & live feedback ----------
+function updateUI(){
+  document.getElementById('totalReports').textContent = reports.length;
+  document.getElementById('userCoins').textContent = userData.coins;
+  document.getElementById('userCoinsDisplay').textContent = userData.coins;
+  document.getElementById('userPhotos').textContent = userData.photos;
+  const resolved = reports.filter(r => r.status === 'resolved').length;
+  document.getElementById('resolvedReports').textContent = resolved;
+  document.getElementById('totalCoins').textContent = userData.coins;
+  document.getElementById('activeUsers').textContent = Math.min(100, Math.max(1, Math.floor(reports.length / 3)));
+  document.getElementById('userAwards').textContent = userData.awards;
+}
+
+function renderLiveFeedback(){
+  const container = document.getElementById('liveFeedback');
+  container.innerHTML = '';
+  const sample = reports.slice(0, 10);
+  sample.forEach(r => {
+    const div = document.createElement('div'); div.className = 'bg-green-50 border-l-4 border-green-400 p-4 slide-in';
+    const initial = (r.name && r.name[0]) ? r.name[0].toUpperCase() : 'U';
+    const timeAgo = timeSince(new Date(r.createdAt));
+    div.innerHTML = `<div class="flex items-center"><div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white text-sm font-bold">${initial}</div><div class="ml-3"><p class="text-sm font-medium text-green-800">${r.name}</p><p class="text-xs text-green-600">Reported garbage in ${r.area}</p><p class="text-xs text-gray-500">${timeAgo}</p></div></div>`;
+    container.appendChild(div);
+  });
+}
+
+function timeSince(date){
+  const seconds = Math.floor((new Date() - date)/1000);
+  if(seconds < 60) return `${seconds} secs ago`;
+  const m = Math.floor(seconds/60);
+  if(m < 60) return `${m} mins ago`;
+  const h = Math.floor(m/60);
+  if(h < 24) return `${h} hrs ago`;
+  const d = Math.floor(h/24);
+  return `${d} days ago`;
+}
+
+// ---------- Utilities ----------
+function exportAllData(){
+  const payload = { exportedAt: new Date().toISOString(), reports, userData };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cleancity_data_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearLocalData(){
+  if(!confirm('Are you sure? This will remove all local reports and user data.')) return;
+  localStorage.removeItem(STORAGE_REPORTS_KEY);
+  localStorage.removeItem(STORAGE_USER_KEY);
+  reports = []; userData = { photos:0, coins:0, awards:0, isLoggedIn:false };
+  updateUI(); renderLiveFeedback();
+  alert('Local data cleared.');
+}
+
+function getLocation(){
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude.toFixed(6), lon = pos.coords.longitude.toFixed(6);
+      document.getElementById('reportArea').value = `Lat: ${lat}, Lon: ${lon}`;
+    }, ()=> alert('Unable to get location. Please enter manually.'));
+  } else alert('Geolocation not supported.');
+}
+
+function calcAwards(photoCount){
+  let awards = 0;
+  if(photoCount >= 5) awards += 1;
+  if(photoCount >= 50) awards += 1;
+  if(photoCount >= 100) awards += 1;
+  return awards;
+}
+
+// ---------- small on-load ----------
+document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
+
+</body>
+</html>
